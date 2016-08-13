@@ -840,14 +840,55 @@ describe('app', function() {
       });
     });
 
+    it('supports `protocol` handler', function(done) {
+      var app = loopback();
+
+      app.listen(function() {
+        expect(app.get('protocol'), 'protocol').to.not.equal(null);
+
+        done();
+      });
+    });
+
+    it('supports `http/2` protocol', function(done) {
+      var app = loopback();
+
+      app.listen(function() {
+        var protocol = app.get('protocol');
+
+        if (protocol == 'http2') {
+          app.get('/', function(req, res) { res.status(200).send('OK'); });
+
+          var server = app.listen();
+
+          expect(server).to.be.an.instanceOf(require('http2').Server);
+
+          request(server)
+            .get('/')
+            .expect(200, done);
+        } else {
+          done();
+        }
+      });
+    });
+
     it('updates `url` on `listening` event', function(done) {
       var app = loopback();
       app.set('port', 0);
       app.set('host', undefined);
 
       app.listen(function() {
+        var protocol = app.get('protocol');
+
         var host = process.platform === 'win32' ? 'localhost' : app.get('host');
-        var expectedUrl = 'http://' + host + ':' + app.get('port') + '/';
+        var expectedUrl = '';
+
+        if (protocol == 'https') {
+          expectedUrl = 'https://';
+        } else {
+          expectedUrl = 'http://';
+        }
+        expectedUrl = expectedUrl + host + ':' + app.get('port') + '/';
         expect(app.get('url'), 'url').to.equal(expectedUrl);
 
         done();
