@@ -1,8 +1,8 @@
 {
   "port": 3000,
   "protocol": "http2",
-  "sslKeyPath": "",
-  "sslCertPath": "",
+  "sslKeyPath": "test/fixtures/simple-app-http2/certs/server.key",
+  "sslCertPath": "test/fixtures/simple-app-http2/certs/server.crt",
   "host": "127.0.0.1",
   "remoting": {
     "errorHandler": {
